@@ -1,0 +1,64 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Copy and Paste from Clipboard</title>
+<style>
+	.container {
+		text-align: center;
+		font-family: "Verdana";
+	}
+	#copy-text {
+		text-align: left;
+		width: 300px;
+		height: 100px;
+		display: block;
+		position: relative;
+		left: 0px;
+		right: 0px;
+		margin: auto;
+		border: 1px solid black;
+		outline: none;
+	}
+</style>
+</head>
+
+<body>
+	<div class="container">
+		<h1>Copy and Paste from Clipboard Including Images</h1>
+		<div id="copy-text" contenteditable="">This is the example text with 😋</div>
+		<button id="btn-copy">Copy</button>
+		<button id="btn-paste">Paste</button>
+	</div>
+	<div id="paste-here"></div>
+<script>
+	const copyButton = document.getElementById('btn-copy');
+	const pasteButton = document.getElementById('btn-paste');
+    // navigator // es una variable global que es el objeto que determina que tiene en su memoria cache
+	copyButton.onclick = function(){
+		const content = document.getElementById('copy-text').innerHTML;
+		navigator.clipboard.writeText(content);// se copia con clipboard . writeText el texto en memoria
+	}
+	pasteButton.addEventListener('click', async (event) => {
+		const data = await navigator.clipboard.read();
+		const clipboardContent = data[0];
+		const type = clipboardContent.types[0];
+		if(type == 'text/plain'){
+			const blob = await clipboardContent.getType('text/plain');
+			var text = await blob.text();
+			var p = document.createElement('p');
+			p.innerHTML = text;
+			document.getElementById('paste-here').appendChild(p);
+		}else{
+			//for image
+			const blob = await clipboardContent.getType('image/png');
+			const url = window.URL.createObjectURL(blob);
+			const img = document.createElement('img');
+			img.src = url;
+			img.style.maxHeight = '200px';
+			document.getElementById('paste-here').appendChild(img);
+		}
+	})
+</script>
+</body>
+</html>
